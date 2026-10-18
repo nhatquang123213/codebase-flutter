@@ -1,0 +1,5 @@
+# Copy to android/key.properties (git-ignored) and fill in real values.
+storePassword=
+keyPassword=
+keyAlias=upload
+storeFile=/absolute/path/to/upload-keystore.jks

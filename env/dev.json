@@ -1,0 +1,6 @@
+{
+  "FLAVOR": "dev",
+  "BASE_URL": "https://dev-api.example.com",
+  "WS_URL": "wss://dev-api.example.com/ws",
+  "USE_MOCK_API": "true"
+}

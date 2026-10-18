@@ -1,0 +1,10 @@
+targets:
+  $default:
+    builders:
+      json_serializable:
+        options:
+          # API uses snake_case; models stay camelCase.
+          field_rename: snake
+          explicit_to_json: true
+          # Fail fast on unexpected JSON instead of producing half-filled models.
+          checked: true

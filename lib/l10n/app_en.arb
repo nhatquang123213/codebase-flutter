@@ -1,0 +1,35 @@
+{
+  "@@locale": "en",
+  "appTitle": "Codebase Flutter",
+  "login": "Log in",
+  "logout": "Log out",
+  "email": "Email",
+  "password": "Password",
+  "fieldRequired": "This field is required",
+  "emailInvalid": "Invalid email address",
+  "passwordTooShort": "Password must be at least {min} characters",
+  "@passwordTooShort": {
+    "placeholders": { "min": { "type": "int" } }
+  },
+  "invalidCredentials": "Incorrect email or password",
+  "demoAccountHint": "Demo account: {email} / {password}",
+  "@demoAccountHint": {
+    "placeholders": { "email": { "type": "String" }, "password": { "type": "String" } }
+  },
+  "welcome": "Hello, {name}!",
+  "@welcome": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "settings": "Settings",
+  "darkMode": "Dark mode",
+  "language": "Language",
+  "systemDefault": "System",
+  "pageNotFound": "Page not found",
+  "retry": "Retry",
+  "errorNetwork": "No internet connection. Please try again.",
+  "errorTimeout": "The request timed out. Please try again.",
+  "errorServer": "Something went wrong on the server.",
+  "errorUnauthorized": "Your session has expired. Please log in again.",
+  "offlineBanner": "No internet connection",
+  "errorUnknown": "An unexpected error occurred."
+}

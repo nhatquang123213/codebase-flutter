@@ -1,0 +1,6 @@
+{
+  "FLAVOR": "prod",
+  "BASE_URL": "https://api.example.com",
+  "WS_URL": "wss://api.example.com/ws",
+  "USE_MOCK_API": "false"
+}

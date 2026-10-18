@@ -1,0 +1,6 @@
+{
+  "FLAVOR": "staging",
+  "BASE_URL": "https://staging-api.example.com",
+  "WS_URL": "wss://staging-api.example.com/ws",
+  "USE_MOCK_API": "false"
+}
