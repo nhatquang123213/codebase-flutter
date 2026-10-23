@@ -25,7 +25,8 @@ Layout: `lib/core` (shared infrastructure: network, DI, events, config, …), `l
   and runs the analyzer; `pre-push` runs the tests. Skip once with `git commit --no-verify`.
 * **CI** (`.github/workflows/ci.yml`) on every PR and push to `main`: `make check` plus a check that
   generated code (`*.g.dart`, l10n) is committed, a scaffold smoke test, a dev debug APK (uploaded as
-  an artifact) and an iOS dev build without codesigning. The iOS job runs on macOS runners, which are
+  an artifact) and an iOS dev build without codesigning. The iOS job needs the `macos-26` image (Xcode 26, required by
+  `connectivity_plus` 7) and runs on macOS runners, which are
   10× the price of Linux minutes on private repos — drop it or gate it on `main` if that matters.
 * **Dependabot** opens weekly pub PRs (Firebase packages grouped) and monthly ones for GitHub Actions
   and Gradle.
