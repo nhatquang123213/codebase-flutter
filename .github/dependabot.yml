@@ -1,3 +1,5 @@
+# Keep the noise down: one grouped PR per ecosystem for minor/patch bumps,
+# majors as separate PRs (they usually need hands-on work).
 version: 2
 updates:
   - package-ecosystem: pub
@@ -5,15 +7,21 @@ updates:
     schedule:
       interval: weekly
     groups:
-      firebase:
-        patterns: ["firebase_*"]
-      dev:
-        dependency-type: development
+      pub-minor:
+        update-types: [minor, patch]
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: monthly
+    groups:
+      actions:
+        patterns: ["*"]
   - package-ecosystem: gradle
     directory: /android
     schedule:
       interval: monthly
+    # AGP / Gradle / Kotlin majors must move together with the Flutter tooling
+    # (and each other), so they are left to a deliberate upgrade.
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
