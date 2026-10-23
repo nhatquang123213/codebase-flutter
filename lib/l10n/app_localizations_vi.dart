@@ -83,4 +83,24 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get errorUnknown => 'Đã xảy ra lỗi không mong muốn.';
+
+  @override
+  String get updateRequiredTitle => 'Cần cập nhật ứng dụng';
+
+  @override
+  String get updateRequiredBody =>
+      'Phiên bản này không còn được hỗ trợ. Vui lòng cập nhật để tiếp tục sử dụng.';
+
+  @override
+  String get updateAvailableTitle => 'Có bản cập nhật mới';
+
+  @override
+  String get updateAvailableBody =>
+      'Phiên bản mới với nhiều cải tiến đã sẵn sàng.';
+
+  @override
+  String get updateNow => 'Cập nhật ngay';
+
+  @override
+  String get later => 'Để sau';
 }

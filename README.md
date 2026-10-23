@@ -2,18 +2,94 @@
 
 Flutter base codebase
 
-## Getting Started
+## Getting started
 
-This project is a starting point for a Flutter application.
+```sh
+make setup          # pub get, git hooks, l10n
+make run-dev        # or run-staging / run-prod, or the VS Code launch configs
+make check          # format + analyze + test (what CI runs)
+make feature name=orders   # scaffold a new feature
+```
 
-A few resources to get you started if this is your first Flutter project:
+Everything runs without a backend when `USE_MOCK_API=true` (default in `env/dev.json`;
+sign in with `demo@example.com` / `123456`) and without a Firebase project until you run
+`make firebase-<flavor>`.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Layout: `lib/core` (shared infrastructure: network, DI, events, config, …), `lib/features/<name>`
+(one folder per feature: `data` / `domain` / `presentation` + `<name>_injection.dart`), `lib/app`
+(root widget, router, bootstrap).
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Development workflow
+
+* **Git hooks** (`make hooks`, included in `make setup`): `pre-commit` checks formatting of staged Dart files
+  and runs the analyzer; `pre-push` runs the tests. Skip once with `git commit --no-verify`.
+* **CI** (`.github/workflows/ci.yml`) on every PR and push to `main`: `make check` plus a check that
+  generated code (`*.g.dart`, l10n) is committed, a scaffold smoke test, a dev debug APK (uploaded as
+  an artifact) and an iOS dev build without codesigning. The iOS job runs on macOS runners, which are
+  10× the price of Linux minutes on private repos — drop it or gate it on `main` if that matters.
+* **Dependabot** opens weekly pub PRs (Firebase packages grouped) and monthly ones for GitHub Actions
+  and Gradle.
+
+## Adding a feature
+
+```sh
+make feature name=orders              # entity defaults to the singular: Order
+make feature name=order_items entity=order_item
+```
+
+This creates `lib/features/orders/` with the full data / domain / presentation stack for a list screen
+(entity, `json_serializable` model, remote + mock data sources, repository, use case, cubit, page,
+injection) and two tests, then wires it in: `ApiEndpoints.orders`, `AppRoutes.orders`, a `GoRoute`,
+`registerOrdersDependencies(getIt)` and an `ordersTitle` l10n key (translate it in `app_vi.arb`).
+Finally it runs `make gen l10n`. The result passes `make check` as-is; CI re-verifies that on every
+PR so the generator cannot rot.
+
+The templates live in `tool/scaffold_feature.dart`. Change them when the conventions change.
+
+## Remote config & feature flags
+
+`RemoteConfigService` (`lib/core/config/remote_config.dart`) wraps Firebase Remote Config: defaults are
+applied and last session's values activated synchronously at startup, then a fetch runs in the
+background and realtime updates are activated as they arrive. `onUpdated` fires after each activation.
+Without Firebase, `InMemoryRemoteConfigService` serves `RemoteConfigKeys.defaults` (it is also the test
+double: `config.update({...})`).
+
+Debug builds fetch on every launch; release builds use a 1 hour minimum interval.
+
+Flags are read through `FeatureFlags` so call sites never spell raw keys:
+
+```dart
+if (getIt<FeatureFlags>().exampleFeature) ...
+```
+
+Add a key to `RemoteConfigKeys` (+ default), a getter to `FeatureFlags`, and the parameter in the
+Firebase console.
+
+## Force update
+
+`features/app_update` compares the running version (`package_info_plus`) with two remote config keys:
+
+| Key | Effect when the app is older |
+|---|---|
+| `min_supported_version` | **Blocks** the app with `ForceUpdatePage` |
+| `latest_version` | Shows a dismissible "update available" strip |
+
+`store_url_android` / `store_url_ios` feed the "Update now" button. `UpdateGate` is installed through
+`MaterialApp.builder`, and `AppUpdateCubit` re-evaluates on every remote config update, so a bad
+release can be blocked for running apps within minutes without a restart. Unknown or unparsable
+versions never block.
+
+## Analytics
+
+`Analytics` (`lib/core/analytics/analytics.dart`) is the only thing features talk to;
+`FirebaseAnalyticsService` implements it when Firebase is configured, `NoopAnalytics` logs to the
+console otherwise. Collection is disabled in debug builds.
+
+* `AnalyticsRouteObserver` logs a screen view per go_router page (named after the path). A
+  `ShellRoute` has its own navigator and needs its own observer instance.
+* The signed-in user id is set together with Crashlytics in `App`.
+* `LoginCubit` logs `login` on success — copy that pattern: inject `Analytics`, call it where the
+  business event happens, name events in `AnalyticsEvents`.
 
 ## Flavors
 

@@ -1,13 +1,21 @@
-.PHONY: get l10n gen watch format analyze test check run-dev run-staging run-prod apk-prod aab-prod ipa-prod clean firebase-dev firebase-staging firebase-prod
+.PHONY: setup get hooks l10n gen watch format analyze test check feature run-dev run-staging run-prod apk-prod aab-prod ipa-prod clean firebase-dev firebase-staging firebase-prod crashlytics-symbols-prod
+
+# First thing after cloning.
+setup: get hooks l10n
 
 get:
 	flutter pub get
+
+# Git hooks live in .githooks (pre-commit: format + analyze, pre-push: tests).
+hooks:
+	git config core.hooksPath .githooks
+	chmod +x .githooks/*
 
 l10n:
 	flutter gen-l10n
 
 format:
-	dart format lib test
+	dart format lib test tool
 
 analyze:
 	flutter analyze
@@ -17,7 +25,7 @@ test:
 
 # Run before every commit / in CI
 check:
-	dart format --output=none --set-exit-if-changed lib test
+	dart format --output=none --set-exit-if-changed lib test tool
 	flutter analyze
 	flutter test
 
@@ -53,6 +61,16 @@ watch:
 
 clean:
 	flutter clean && flutter pub get
+
+# ---- Feature scaffold ----
+# make feature name=orders [entity=order]
+# Creates lib/features/<name>, tests, and wires endpoint/route/DI/l10n title.
+feature:
+ifndef name
+	$(error Usage: make feature name=<snake_case> [entity=<snake_case_singular>])
+endif
+	dart run tool/scaffold_feature.dart $(name) $(if $(entity),--entity $(entity))
+	$(MAKE) gen l10n
 
 # ---- Firebase (push notifications) ----
 # One Firebase project per flavor. Set the ids below (or pass FIREBASE_PROJECT_DEV=... on the command line),

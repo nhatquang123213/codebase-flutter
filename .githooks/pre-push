@@ -1,0 +1,4 @@
+#!/bin/sh
+# Tests run on push rather than commit so small WIP commits stay fast.
+set -e
+flutter test --no-pub

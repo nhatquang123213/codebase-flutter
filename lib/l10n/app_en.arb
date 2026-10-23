@@ -31,5 +31,11 @@
   "errorServer": "Something went wrong on the server.",
   "errorUnauthorized": "Your session has expired. Please log in again.",
   "offlineBanner": "No internet connection",
-  "errorUnknown": "An unexpected error occurred."
+  "errorUnknown": "An unexpected error occurred.",
+  "updateRequiredTitle": "Update required",
+  "updateRequiredBody": "This version of the app is no longer supported. Please update to continue.",
+  "updateAvailableTitle": "Update available",
+  "updateAvailableBody": "A newer version with improvements is ready.",
+  "updateNow": "Update now",
+  "later": "Later"
 }

@@ -52,6 +52,10 @@ dependencies:
   connectivity_plus: ^7.3.2
   web_socket_channel: ^3.0.3
   clock: ^1.1.2
+  firebase_remote_config: ^7.0.0
+  firebase_analytics: ^13.0.0
+  package_info_plus: ^10.2.2
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_test:

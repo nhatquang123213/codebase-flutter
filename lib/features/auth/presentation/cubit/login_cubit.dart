@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/analytics/analytics.dart';
 import '../../../../core/error/failure.dart';
 import '../../../../core/error/result.dart';
 import '../../domain/entities/user.dart';
@@ -9,9 +12,10 @@ import '../../domain/usecases/login_usecase.dart';
 part 'login_state.dart';
 
 class LoginCubit extends Cubit<LoginState> {
-  LoginCubit(this._login) : super(const LoginState());
+  LoginCubit(this._login, this._analytics) : super(const LoginState());
 
   final LoginUseCase _login;
+  final Analytics _analytics;
 
   Future<void> submit({required String email, required String password}) async {
     if (state.status == LoginStatus.submitting) return;
@@ -19,6 +23,7 @@ class LoginCubit extends Cubit<LoginState> {
     final result = await _login(
       LoginParams(email: email.trim(), password: password),
     );
+    if (result is Success<User>) unawaited(_analytics.logLogin());
     emit(switch (result) {
       Success(:final data) => LoginState(
         status: LoginStatus.success,

@@ -28,5 +28,5 @@ void registerAuthDependencies(GetIt getIt) {
       () =>
           AuthBloc(getCurrentUser: getIt(), logout: getIt(), eventBus: getIt()),
     )
-    ..registerFactory(() => LoginCubit(getIt()));
+    ..registerFactory(() => LoginCubit(getIt(), getIt()));
 }

@@ -14,15 +14,18 @@ import 'app_routes.dart';
 /// Navigation is driven by [AuthBloc]: pages never push login/home themselves,
 /// they change auth state and [_redirect] does the rest.
 class AppRouter {
-  AppRouter(this._authBloc);
+  AppRouter(this._authBloc, {List<NavigatorObserver> observers = const []})
+    : _observers = observers;
 
   final AuthBloc _authBloc;
+  final List<NavigatorObserver> _observers;
   late final _refresh = _StreamListenable(_authBloc.stream);
 
   late final GoRouter router = GoRouter(
     initialLocation: AppRoutes.splash,
     debugLogDiagnostics: !Env.isProd,
     refreshListenable: _refresh,
+    observers: _observers,
     redirect: _redirect,
     routes: [
       GoRoute(path: AppRoutes.splash, builder: (_, _) => const SplashPage()),

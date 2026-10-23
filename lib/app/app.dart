@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../core/analytics/analytics.dart';
+import '../core/analytics/analytics_route_observer.dart';
 import '../core/connectivity/connectivity_cubit.dart';
 import '../core/connectivity/offline_banner.dart';
 import '../core/di/injection.dart';
@@ -11,6 +13,8 @@ import '../core/notifications/notification_payload.dart';
 import '../core/realtime/realtime_session.dart';
 import '../core/theme/app_theme.dart';
 import '../core/utils/app_logger.dart';
+import '../features/app_update/presentation/cubit/app_update_cubit.dart';
+import '../features/app_update/presentation/widgets/update_gate.dart';
 import '../features/auth/presentation/bloc/auth_bloc.dart';
 import '../features/notifications/application/push_token_sync.dart';
 import '../features/settings/presentation/cubit/settings_cubit.dart';
@@ -26,7 +30,11 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
   late final AuthBloc _authBloc = getIt<AuthBloc>()..add(const AuthStarted());
-  late final AppRouter _appRouter = AppRouter(_authBloc);
+  late final Analytics _analytics = getIt<Analytics>();
+  late final AppRouter _appRouter = AppRouter(
+    _authBloc,
+    observers: [AnalyticsRouteObserver(_analytics)],
+  );
   late final PushTokenSync _pushTokenSync = getIt<PushTokenSync>();
   late final RealtimeSession _realtimeSession = getIt<RealtimeSession>();
   late final StreamSubscription<NotificationPayload> _notificationTaps;
@@ -45,7 +53,10 @@ class _AppState extends State<App> {
     _authUser = _authBloc.stream
         .map((state) => state.user?.id)
         .distinct()
-        .listen((id) => unawaited(AppLogger.reporter.setUserId(id)));
+        .listen((id) {
+          unawaited(AppLogger.reporter.setUserId(id));
+          unawaited(_analytics.setUserId(id));
+        });
     final notifications = getIt<NotificationHandler>();
     _notificationTaps = notifications.onTap.listen(_onNotificationTap);
     unawaited(notifications.start());
@@ -80,6 +91,7 @@ class _AppState extends State<App> {
         BlocProvider.value(value: _authBloc),
         BlocProvider(create: (_) => getIt<SettingsCubit>()),
         BlocProvider(create: (_) => getIt<ConnectivityCubit>()),
+        BlocProvider(create: (_) => getIt<AppUpdateCubit>()..start()),
       ],
       child: BlocBuilder<SettingsCubit, SettingsState>(
         builder: (context, settings) => MaterialApp.router(
@@ -92,7 +104,8 @@ class _AppState extends State<App> {
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           routerConfig: _appRouter.router,
-          builder: (_, child) => OfflineBanner(child: child!),
+          builder: (_, child) =>
+              UpdateGate(child: OfflineBanner(child: child!)),
         ),
       ),
     );

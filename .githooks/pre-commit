@@ -1,0 +1,15 @@
+#!/bin/sh
+# Installed with `make hooks` (sets core.hooksPath). Keeps commits formatted
+# and analyzer-clean so CI rarely fails on style.
+set -e
+
+staged=$(git diff --cached --name-only --diff-filter=ACMR -- '*.dart' | grep -v '\.g\.dart$' || true)
+[ -z "$staged" ] && exit 0
+
+if ! dart format --output=none --set-exit-if-changed $staged; then
+  echo ""
+  echo "pre-commit: some staged files are not formatted. Run 'make format' and stage again."
+  exit 1
+fi
+
+flutter analyze --no-pub

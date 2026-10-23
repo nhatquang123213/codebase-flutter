@@ -83,4 +83,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorUnknown => 'An unexpected error occurred.';
+
+  @override
+  String get updateRequiredTitle => 'Update required';
+
+  @override
+  String get updateRequiredBody =>
+      'This version of the app is no longer supported. Please update to continue.';
+
+  @override
+  String get updateAvailableTitle => 'Update available';
+
+  @override
+  String get updateAvailableBody =>
+      'A newer version with improvements is ready.';
+
+  @override
+  String get updateNow => 'Update now';
+
+  @override
+  String get later => 'Later';
 }
