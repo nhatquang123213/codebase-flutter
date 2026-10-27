@@ -1,0 +1,14 @@
+# App icon for the "prod" flavor. Regenerate with: make icons
+# Source images live in assets/branding/prod/ (replace the placeholders).
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: assets/branding/prod/icon.png
+  min_sdk_android: 21
+  # Android 8+ adaptive icon: solid background + glyph inside the 66% safe zone.
+  adaptive_icon_background: "#2563EB"
+  adaptive_icon_foreground: assets/branding/prod/icon_foreground.png
+  # Android 13+ themed icon (optional, falls back to the foreground).
+  adaptive_icon_monochrome: assets/branding/prod/icon_foreground.png
+  # App Store rejects icons with an alpha channel.
+  remove_alpha_ios: true

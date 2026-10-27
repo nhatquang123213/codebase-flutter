@@ -11,6 +11,8 @@
 
 import 'dart:io';
 
+import 'src/directives.dart';
+
 void main(List<String> args) {
   final options = _Options.parse(args);
   if (options == null) {
@@ -32,9 +34,12 @@ void main(List<String> args) {
 
   final files = _templates(names);
   for (final entry in files.entries) {
+    final content = entry.key.endsWith('.dart')
+        ? sortPackageImports(entry.value)
+        : entry.value;
     File(entry.key)
       ..createSync(recursive: true)
-      ..writeAsStringSync(entry.value);
+      ..writeAsStringSync(content);
     print('  create  ${entry.key}');
   }
 

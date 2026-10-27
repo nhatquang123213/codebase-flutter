@@ -1,0 +1,13 @@
+# Native splash for the "prod" flavor. Regenerate with: make splash
+# Shown by the OS until the first Flutter frame; bootstrap() keeps it up until
+# DI is ready via FlutterNativeSplash.preserve/remove.
+flutter_native_splash:
+  color: "#2563EB"
+  image: assets/branding/prod/splash.png
+  android: true
+  ios: true
+  web: false
+  # Android 12+ draws its own splash: centered icon on a solid color.
+  android_12:
+    color: "#2563EB"
+    image: assets/branding/prod/icon_foreground.png

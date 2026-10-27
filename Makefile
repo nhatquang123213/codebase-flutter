@@ -1,4 +1,4 @@
-.PHONY: setup get hooks l10n gen watch format analyze test check feature run-dev run-staging run-prod apk-prod aab-prod ipa-prod clean firebase-dev firebase-staging firebase-prod crashlytics-symbols-prod
+.PHONY: setup get hooks l10n gen watch format analyze test check feature rename branding icons splash placeholder-branding run-dev run-staging run-prod apk-prod aab-prod ipa-prod clean firebase-dev firebase-staging firebase-prod crashlytics-symbols-prod
 
 # First thing after cloning.
 setup: get hooks l10n
@@ -71,6 +71,40 @@ ifndef name
 endif
 	dart run tool/scaffold_feature.dart $(name) $(if $(entity),--entity $(entity))
 	$(MAKE) gen l10n
+
+# ---- New project from the template ----
+# make rename name="Acme Shop" android_id=com.acme.shop [ios_id=com.acme.shop] [package=acme_shop]
+# Rewrites Dart package, Android applicationId/namespace/Kotlin package, iOS bundle id
+# and the per-flavor display names, then refreshes pub + l10n. Add dry=1 to preview.
+rename:
+ifndef name
+	$(error Usage: make rename name="App Name" android_id=com.company.app [ios_id=...] [package=...] [dry=1])
+endif
+ifndef android_id
+	$(error Usage: make rename name="App Name" android_id=com.company.app [ios_id=...] [package=...] [dry=1])
+endif
+	dart run tool/rename_app.dart --name "$(name)" --android-id $(android_id) \
+		$(if $(ios_id),--ios-id $(ios_id)) $(if $(package),--package $(package)) $(if $(dry),--dry-run)
+ifndef dry
+	flutter pub get
+	$(MAKE) l10n
+endif
+
+# Icons + native splash for every flavor, from assets/branding/<flavor>/.
+# Config: flutter_launcher_icons-<flavor>.yaml, flutter_native_splash-<flavor>.yaml.
+branding: icons splash
+
+icons:
+	dart run flutter_launcher_icons
+	# flutter_launcher_icons 0.14 also rewrites this unrelated Xcode setting; put it back.
+	sed -i '' -E 's/(ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = )AppIcon-[a-z]+;/\1YES;/' ios/Runner.xcodeproj/project.pbxproj
+
+splash:
+	dart run flutter_native_splash:create --flavors dev,staging,prod
+
+# Regenerates the placeholder artwork (colored ring per flavor). Replace with real assets instead.
+placeholder-branding:
+	dart run tool/placeholder_branding.dart
 
 # ---- Firebase (push notifications) ----
 # One Firebase project per flavor. Set the ids below (or pass FIREBASE_PROJECT_DEV=... on the command line),

@@ -19,6 +19,27 @@ Layout: `lib/core` (shared infrastructure: network, DI, events, config, …), `l
 (one folder per feature: `data` / `domain` / `presentation` + `<name>_injection.dart`), `lib/app`
 (root widget, router, bootstrap).
 
+## New project from this template
+
+```sh
+make rename name="Acme Shop" android_id=com.acme.shop   # add dry=1 to preview
+make branding                                          # icons + splash for all flavors
+```
+
+`make rename` rewrites the Dart package name, Android `applicationId` / `namespace` / Kotlin
+package directory, iOS bundle ids, and the display name of every flavor ("Acme Shop Dev",
+"Acme Shop Staging", "Acme Shop"). `ios_id=` defaults to the Android id with snake_case
+segments camelCased (bundle ids cannot contain `_`); `package=` defaults to the last segment.
+Afterwards re-run `make firebase-<flavor>` so the Firebase apps match the new ids.
+
+Branding lives in `assets/branding/<flavor>/`: `icon.png` (1024, full bleed),
+`icon_foreground.png` (1024, transparent, glyph inside the centre 66%), `splash.png`
+(512, transparent). Replace the placeholders, then `make branding` regenerates
+`android/app/src/<flavor>/res`, `ios/Runner/Assets.xcassets/AppIcon-<flavor>` and
+`LaunchScreen<Flavor>.storyboard`. Colors are in `flutter_launcher_icons-<flavor>.yaml`
+and `flutter_native_splash-<flavor>.yaml`. The native splash stays up until DI is ready
+(`FlutterNativeSplash.preserve/remove` in `bootstrap.dart`).
+
 ## Development workflow
 
 * **Git hooks** (`make hooks`, included in `make setup`): `pre-commit` checks formatting of staged Dart files

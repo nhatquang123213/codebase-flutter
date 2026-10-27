@@ -54,6 +54,31 @@ jobs:
       - run: make feature name=orders
       - run: make check
 
+  # Guards the template rename: rename everything, then nothing may still
+  # reference the template ids and the result must still pass make check.
+  rename:
+    name: Template rename smoke test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: make rename name="Acme Shop" android_id=com.acme.shop_app
+      - name: No template identifiers left behind
+        run: |
+          # Brackets keep this line itself from matching (and from being renamed).
+          if git grep -n -I -i -e 'codebase[_]flutter' -e 'codebase[F]lutter' -e 'Codebase [D]ev' -e 'Codebase [F]lutter' -- . ':!README.md'; then
+            echo "::error::rename left template identifiers behind"
+            exit 1
+          fi
+          test -f android/app/src/main/kotlin/com/acme/shop_app/MainActivity.kt
+      - run: make check
+
   build-android:
     name: Build Android (dev)
     runs-on: ubuntu-latest
