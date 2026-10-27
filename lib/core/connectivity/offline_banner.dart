@@ -56,6 +56,7 @@ class OfflineBanner extends StatelessWidget {
           child: MediaQuery.removePadding(
             context: context,
             removeTop: !isOnline,
+            removeBottom: !isOnline,
             child: child,
           ),
         ),
